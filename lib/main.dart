@@ -9,8 +9,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
-  DbHelper dbHelper = DbHelper.getInstance();
-  DbHelper dbHelper1 = DbHelper.getInstance();
 
 
   // This widget is the root of your application.
