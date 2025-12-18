@@ -67,13 +67,38 @@ class DbHelper {
     return rowsEffected > 0;
   }
 
-   Future<List<Map<String, dynamic>>> fetchAllNotes() async {
+  Future<List<Map<String, dynamic>>> fetchAllNotes() async {
     var db = await initDB();
 
     List<Map<String, dynamic>> allNotes = await db.query(table_note);
 
     return allNotes;
   }
+
   /// update
+  Future<bool> updateNote({
+    required String updTitle,
+    required String updDesc,
+    required int id,
+  }) async {
+    var db = await initDB();
+
+    int rowsEffected = await db.update(
+      table_note,
+      {column_note_title: updTitle, column_note_desc: updDesc},
+      where: "$column_note_id = ?",
+      whereArgs: ["$id"],
+    );
+
+    return rowsEffected > 0;
+  }
+
   /// delete
+  Future<bool> deleteNote({required int id}) async {
+    var db = await initDB();
+
+    int rowsEffected = await db.delete(table_note, where: "$column_note_id = ?", whereArgs: ["$id"]);
+
+    return rowsEffected >0;
+  }
 }

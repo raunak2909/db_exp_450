@@ -36,6 +36,34 @@ class _HomePageState extends State<HomePage> {
                 return ListTile(
                   title: Text(mNotes[index][DbHelper.column_note_title]),
                   subtitle: Text(mNotes[index][DbHelper.column_note_desc]),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          bool isUpdated = await dbHelper!.updateNote(
+                            updTitle: "Update Note",
+                            updDesc: "This desc is updated",
+                            id: mNotes[index][DbHelper.column_note_id],
+                          );
+
+                          if(isUpdated){
+                            getAllNotes();
+                          }
+                        },
+                        icon: Icon(Icons.edit_note),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          bool isDeleted = await dbHelper!.deleteNote(id: mNotes[index][DbHelper.column_note_id]);
+                          if(isDeleted){
+                            getAllNotes();
+                          }
+                        },
+                        icon: Icon(Icons.delete, color: Colors.red),
+                      ),
+                    ],
+                  ),
                 );
               },
             )
@@ -95,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                               desc: descController.text,
                             );
 
-                            if(isAdded){
+                            if (isAdded) {
                               getAllNotes();
                               Navigator.pop(context);
                             }
