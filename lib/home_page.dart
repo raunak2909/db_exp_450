@@ -1,3 +1,4 @@
+import 'package:db_exp_450/add_note_page.dart';
 import 'package:db_exp_450/db_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -41,24 +42,83 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       IconButton(
                         onPressed: () async {
-                          bool isUpdated = await dbHelper!.updateNote(
-                            updTitle: "Update Note",
-                            updDesc: "This desc is updated",
-                            id: mNotes[index][DbHelper.column_note_id],
+                          titleController.text =
+                              mNotes[index][DbHelper.column_note_title];
+                          descController.text =
+                              mNotes[index][DbHelper.column_note_desc];
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) {
+                                return AddNotePage(
+                                  isUpdate: true,
+                                  id: mNotes[index][DbHelper.column_note_id],
+                                  title: mNotes[index][DbHelper.column_note_title],
+                                  desc: mNotes[index][DbHelper.column_note_desc],
+                                );
+                              },
+                            ),
                           );
 
-                          if(isUpdated){
-                            getAllNotes();
-                          }
+                          /*showModalBottomSheet(
+                            context: context,
+                            builder: (_) {
+                              return getMyBottomSheetUI(
+                                isUpdate: true,
+                                id: mNotes[index][DbHelper.column_note_id],
+                              );
+                            },
+                          );*/
                         },
                         icon: Icon(Icons.edit_note),
                       ),
                       IconButton(
                         onPressed: () async {
-                          bool isDeleted = await dbHelper!.deleteNote(id: mNotes[index][DbHelper.column_note_id]);
-                          if(isDeleted){
-                            getAllNotes();
-                          }
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (_) {
+                              return Container(
+                                padding: EdgeInsets.all(11),
+                                height: 120,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Are you sure you want to delete this note?',
+                                      style: TextStyle(fontSize: 19),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            bool isDeleted = await dbHelper!
+                                                .deleteNote(
+                                                  id:
+                                                      mNotes[index][DbHelper
+                                                          .column_note_id],
+                                                );
+                                            if (isDeleted) {
+                                              getAllNotes();
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                          child: Text('Yes'),
+                                        ),
+                                        SizedBox(width: 11),
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('No'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
                         },
                         icon: Icon(Icons.delete, color: Colors.red),
                       ),
@@ -73,79 +133,100 @@ class _HomePageState extends State<HomePage> {
           /// add the note
           titleController.clear();
           descController.text = "";
-          showModalBottomSheet(
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) {
+                return AddNotePage();
+              },
+            ),
+          );
+
+          /*showModalBottomSheet(
             context: context,
             builder: (_) {
-              return Container(
-                padding: EdgeInsets.all(11),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Text(
-                      'Add Note',
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 11),
-                    TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your title here..",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(21),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 11),
-                    TextField(
-                      controller: descController,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        alignLabelWithHint: true,
-                        labelText: "Desc",
-                        hintText: "Enter your desc here..",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(21),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 11),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        OutlinedButton(
-                          onPressed: () async {
-                            bool isAdded = await dbHelper!.addNote(
-                              title: titleController.text,
-                              desc: descController.text,
-                            );
-
-                            if (isAdded) {
-                              getAllNotes();
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text('Add'),
-                        ),
-                        SizedBox(width: 11),
-                        OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('Cancel'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
+              return getMyBottomSheetUI();
             },
-          );
+          );*/
         },
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget getMyBottomSheetUI({bool isUpdate = false, int? id}) {
+    return Container(
+      padding: EdgeInsets.all(11),
+      width: double.infinity,
+      child: Column(
+        children: [
+          Text(
+            '${isUpdate ? 'Update' : 'Add'} Note',
+            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 11),
+          TextField(
+            controller: titleController,
+            decoration: InputDecoration(
+              labelText: "Title",
+              hintText: "Enter your title here..",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(21),
+              ),
+            ),
+          ),
+          SizedBox(height: 11),
+          TextField(
+            controller: descController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              alignLabelWithHint: true,
+              labelText: "Desc",
+              hintText: "Enter your desc here..",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(21),
+              ),
+            ),
+          ),
+          SizedBox(height: 11),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OutlinedButton(
+                onPressed: () async {
+                  bool isChanged = false;
+
+                  if (isUpdate) {
+                    isChanged = await dbHelper!.updateNote(
+                      updTitle: titleController.text,
+                      updDesc: descController.text,
+                      id: id!,
+                    );
+                  } else {
+                    isChanged = await dbHelper!.addNote(
+                      title: titleController.text,
+                      desc: descController.text,
+                    );
+                  }
+
+                  if (isChanged) {
+                    getAllNotes();
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text('Save'),
+              ),
+              SizedBox(width: 11),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
